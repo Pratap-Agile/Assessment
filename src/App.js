@@ -3,9 +3,9 @@ import "./App.css";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 
 import Login from "./Auth/Login";
-import Location_Management from "./Pages/Location_Management";
-import View_Location from "./Pages/View_Location";
-import Edit_location from "./Pages/Edit_Location";
+import Location_Management from "./Pages/Location_Mange/Location_Management";
+import View_Location from "./Pages/View_Location/View_Location";
+import Edit_location from "./Pages/Edit_Location/Edit_Location";
 
 function App() {
   const token = localStorage.getItem("access_token");
