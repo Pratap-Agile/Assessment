@@ -8,14 +8,10 @@ import Grid from "@material-ui/core/Grid";
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import Typography from "@material-ui/core/Typography";
 
-// import classes from "./Login.module.css";
-// import { useHistory } from "react-router-dom";
-
 import { makeStyles } from "@material-ui/core/styles";
 import swal from "sweetalert";
 import { API } from "../API/API";
-
-// const API = process.env.REACT_APP_API;
+import { NavLink } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -48,7 +44,10 @@ const Login = () => {
   const [password, setPassword] = useState();
   console.log("login", email, password);
 
-  // const history = useHistory();
+  const token = localStorage.getItem("access_token");
+  if (token) {
+    return <NavLink to="/location" />;
+  }
 
   async function loginUser(userdata) {
     return fetch(`${API}/admin/auth/login`, {

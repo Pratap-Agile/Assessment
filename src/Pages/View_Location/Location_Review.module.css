@@ -1,0 +1,21 @@
+.label{
+    font-size: 18px;
+    display: flex;
+    text-transform: capitalize;
+    font-weight: 900;
+    padding: .40rem;
+    border-bottom: 1px solid #9da6b0cf;
+}
+/* .main_card{
+    justify-content: center;
+    display: flex;
+    align-items: center;
+    background-color: #E4E5E6;
+} */
+.main_card{
+    width: auto;
+    height: auto;
+    margin: 25px;
+    border-radius: 10px;
+    box-shadow: 2px 10px 10px 5px rgba(0, 0, 0, 0.2), 10px 6px 10px 5px rgba(0, 0, 0, 0.19);
+}

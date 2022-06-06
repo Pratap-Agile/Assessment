@@ -1,24 +1,23 @@
 .action_icon{
     margin: 0 5px;
-    font-size: 28px;
+    font-size: 20px;
 }
 
-.label{
-    font-size: 18px;
+/* .main_card{
+    justify-content: center;
     display: flex;
-    text-transform: capitalize;
-    font-weight: 900;
-    padding: .40rem;
-    border-bottom: 1px solid #9da6b0cf;
-}
+    align-items: center;
+    background-color: #E4E5E6;
+} */
 .main_card{
     width: auto;
     height: auto;
-    margin: 15px;
-    /* background-color: #E4E5E6; */
+    margin: 25px;
     border-radius: 10px;
+    overflow-x: auto;
     box-shadow: 2px 10px 10px 5px rgba(0, 0, 0, 0.2), 10px 6px 10px 5px rgba(0, 0, 0, 0.19);
 }
+
 .main_table{
     width: auto;
     height: auto;
@@ -27,4 +26,33 @@
     padding: 0px;
     background-color: #E4E5E6;
     border-radius: 5px;
+}
+.divLocationList{
+    border-bottom: 1px solid #9da6b0cf;
+    display: flex;
+    padding-bottom: 10px;
+}
+
+.label{
+    font-size: 18px;
+    font-weight: 900;
+    margin-right: 10px;
+    /* padding: .40rem; */
+}
+
+.divsearch{
+    margin: 30px;
+}
+
+.divlogout{
+    /* display: flex; */
+    /* right: 0; */
+}
+
+.sport_text{
+    border-radius: 10rem;
+    background-color: #20a8d8;
+    padding: 5px;
+    color: #fff;
+    text-align: center;
 }

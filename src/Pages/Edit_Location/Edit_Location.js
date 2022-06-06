@@ -5,16 +5,23 @@ import classes from "./Edit_Location.module.css";
 import { useParams } from "react-router";
 import { API } from "../../API/API";
 import { useHistory } from "react-router-dom";
+import axios from "axios";
 
 const { Option } = Select;
 
 const Edit_location = () => {
   const history = useHistory();
-
   const { id } = useParams();
+  const [placeName, setPlaceName] = useState({});
+  const [placeAddress, setPlaceAddress] = useState({});
+  const [placePhoneNumber, setPlacePhoneNumber] = useState();
+  const [placeWebsite, setPlaceWebsite] = useState();
+  const [placeVerify, setPlaceVerify] = useState({});
+  const [placePremium, setPlacePremium] = useState({});
+
   const [place, setPlace] = useState({});
-  console.log("button update", place);
-  const [sport, setsport] = useState({});
+
+  const [sport, setSport] = useState({});
   const [allSport, setAllSport] = useState([]);
 
   // const [placeName, setPlaceName] = useState("");
@@ -26,17 +33,13 @@ const Edit_location = () => {
   const myHeaders = new Headers();
   myHeaders.append("Authorization", token);
   myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
-  var urlencoded = new URLSearchParams();
+
+  const urlencoded = new URLSearchParams();
   urlencoded.append("placeId", id);
 
-  const requestOptions = {
-    method: "POST",
-    headers: myHeaders,
-    body: urlencoded,
-  };
   //getplace details end
 
-  //Sport imge start
+  //Sport data start
   const myHeadersSport = new Headers();
   myHeadersSport.append("Content-Type", "application/json");
   myHeadersSport.append("Authorization", token);
@@ -80,63 +83,57 @@ const Edit_location = () => {
     },
   });
 
-  const requestOptionsSport = {
-    method: "POST",
-    headers: myHeadersSport,
-    body: rawSport,
-  };
-  //sport imge end
+  //sport data end
 
-  //EDit update Start
-  const myHeadersEdit = new Headers();
-  myHeadersEdit.append("Authorization", token);
-  myHeadersEdit.append("Content-Type", "application/json");
+  // //EDit update Start
+  // const myHeadersEdit = new Headers();
+  // myHeadersEdit.append("Authorization", token);
+  // myHeadersEdit.append("Content-Type", "application/json");
 
-  // edit api body
-
-  const rawEdit = JSON.stringify({
-    placeId: id,
-    sportIds: ["605c68795b3a1e3260cf2a23", "60e3ddff02e66a45d5e87e64"],
-    isVerified: true,
-    isPremium: false,
-  });
-
-  const requestOptionsEdit = {
-    method: "POST",
-    headers: myHeadersEdit,
-    body: rawEdit,
-    redirect: "follow",
-  };
+  // const requestOptionsEdit = {
+  //   headers: myHeadersEdit,
+  //   body: rawEdit,
+  // };
   //Edit End
 
-  //all sport
-  var requestOptionsAllSport = {
-    method: "GET",
-    headers: myHeaders,
-    redirect: "follow",
-  };
-
   useEffect(() => {
-    fetch(`${API}/admin/api/getPlaceDetails`, requestOptions)
+    // edit get data on input
+    fetch(`${API}/admin/api/getPlaceDetails`, {
+      method: "POST",
+      headers: myHeaders,
+      body: urlencoded,
+    })
       .then((response) => response.json())
       .then((result) => {
-        // console.log("main get place details api",(result));
-        setPlace(result);
+        setPlaceName(result.data.name);
+        setPlaceAddress(result.data.address);
+        setPlacePhoneNumber(result.data.placeContact);
+        setPlaceWebsite(result.data.placeWebsite);
+        setPlaceVerify(result.data.isVerified);
+        setPlacePremium(result.data.isPremium);
       })
       .catch((error) => console.log("error", error));
 
-    fetch(`${API}/admin/api/getSportsList`, requestOptionsSport)
+    fetch(`${API}/admin/api/getSportsList`, {
+      method: "POST",
+      headers: myHeadersSport,
+      body: rawSport,
+    })
       .then((response) => response.json())
       .then((result) => {
         console.log("sport api", result);
-        setsport(result);
+        setSport(result);
       })
       .catch((error) => console.log("error", error));
 
     // All get sport api fetch
-    fetch(`${API}/admin/api/getAllSports`, requestOptionsAllSport)
+    fetch(`${API}/admin/api/getAllSports`, {
+      method: "GET",
+      headers: myHeaders,
+    })
       .then((response) => response.json())
       .then((result) => {
+        console.log("result", result);
         // console.log(
         //   "all sport",
         //   result.data.forEach((element) => {
@@ -150,31 +147,70 @@ const Edit_location = () => {
 
   const updateHandler = (e) => {
     e.preventDefault();
-    fetch(`${API}/admin/api/editPlace`, requestOptionsEdit)
+
+    const rawEdit = JSON.stringify({
+      placeId: "6113b967be89c551f492c415",
+      sportIds: sport,
+      isVerified: placeVerify,
+      isPremium: placePremium,
+    });
+
+    axios({
+      method: "post",
+      url: `${API}/admin/api/editPlace`,
+      headers: {
+        Authorization: token,
+        // "Content-Type": "application/x-www-form-urlencoded"
+      },
+      data: rawEdit,
+    })
       .then((response) => response.json())
-      .then((result) => setPlace(result))
-      .catch((error) => console.log("error", error));
+      .then((result) => console.log(result.data));
+
+    // fetch(`${API}/admin/api/editPlace`, requestOptionsEdit)
+    //   .then((response) => response.json())
+    //   .then((result) => setPlace(result.data))
+    //   .catch((error) => console.log("error", error));
   };
 
   const backHandler = () => {
-    console.log("hello");
     history.push("/location");
   };
 
-  const handleChange = (value, e) => {
-    console.log();
-    setsport(`selected ${value}`);
+  const handleChangeSelect = (value, e) => {
+    setSport(`selected ${value}`);
   };
+
+
+  const verifyCheck = () => {
+    var checkBox = document.getElementById("myCheckVerify");
+
+    if (checkBox.checked == true) {
+      setPlaceVerify(true);
+    } else {
+      setPlaceVerify(false);
+    }
+  };
+
+  const premiumCheck = () => {
+    var checkBox = document.getElementById("myCheckPremium");
+
+    if (checkBox.checked == true) {
+      setPlacePremium(true);
+    } else {
+      setPlacePremium(false);
+    }
+  };
+
+  if (!token) {
+    history.push("/login");
+  }
 
   return (
     <div>
       <Card className={classes.main_div}>
         <h1 className={classes.label}>Edit Location's Available Sports</h1>
         <form>
-          {/* <br />
-        <label htmlFor="firstname">Place Image :- </label>
-        <img src={sport?.data?.data[0]?.image} /> */}
-
           <div className={classes.view_text}>
             <label className={classes.view_text_title}>Place Name </label>
             <input
@@ -183,8 +219,8 @@ const Edit_location = () => {
               name="name"
               placeholder="Place Name"
               disabled
-              onChange={(e) => setPlace(e.target.value)}
-              value={place?.data?.name}
+              onChange={(e) => setPlaceName(e.target.value)}
+              value={placeName}
             />
           </div>
 
@@ -194,9 +230,9 @@ const Edit_location = () => {
               style={{ background: "#E4E7EA" }}
               type="text"
               placeholder="Place Address"
-              onChange={(e) => setPlace(e.target.value)}
+              onChange={(e) => setPlaceAddress(e.target.value)}
               disabled
-              value={place?.data?.address}
+              value={placeAddress}
             />
           </div>
 
@@ -207,8 +243,8 @@ const Edit_location = () => {
             <input
               type="number"
               placeholder="Place Phone Number"
-              value={place?.data?.placeContact}
-              onChange={(e) => setPlace(e.target.value)}
+              onChange={(e) => setPlacePhoneNumber(e.target.value)}
+              value={placePhoneNumber}
             />
           </div>
 
@@ -217,8 +253,8 @@ const Edit_location = () => {
             <input
               type="text"
               placeholder="Place Website"
-              value={place?.data?.placeWebsite}
-              onChange={(e) => setPlace(e.target.value)}
+              value={placeWebsite}
+              onChange={(e) => setPlaceWebsite(e.target.value)}
             />
           </div>
 
@@ -231,10 +267,10 @@ const Edit_location = () => {
               placeholder="Select Sport Name"
               allowClear
               style={{
-                width: "50%",
+                width: "40%",
               }}
               defaultValue={sport?.data?.data[0]?.name}
-              onChange={handleChange}
+              onChange={handleChangeSelect}
             >
               {allSport?.map((text) => (
                 <Option key={text?._id} value={text?._id}>
@@ -248,8 +284,9 @@ const Edit_location = () => {
             <label className={classes.view_text_title}>Verify Location</label>
             <input
               type="checkbox"
-              checked={place?.data?.isVerified}
-              onChange={(e) => setPlace(e.target.value)}
+              checked={placeVerify}
+              id="myCheckVerify"
+              onChange={verifyCheck}
             />
           </div>
 
@@ -257,17 +294,19 @@ const Edit_location = () => {
             <label className={classes.view_text_title}>Premium Location</label>
             <input
               type="checkbox"
-              checked={place?.data?.isPremium}
-              onChange={(e) => setPlace(e.target.value)}
+              checked={placePremium}
+              id="myCheckPremium"
+              onChange={premiumCheck}
             />
           </div>
           <div className={classes.view_text}>
-            <input
+            <button
               className={classes.update_button}
               type="submit"
-              value="Update"
               onClick={updateHandler}
-            />
+            >
+              Update
+            </button>
             <input
               className={classes.update_button}
               type="button"
