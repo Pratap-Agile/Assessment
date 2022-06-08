@@ -1,28 +1,44 @@
 import React, { useEffect, useState } from "react";
 import { API } from "../../API/API";
 import "antd/dist/antd.css";
-import { Table, Card, Checkbox, Avatar, Space, Select } from "antd";
+import {
+  Table,
+  Card,
+  Checkbox,
+  Avatar,
+  Space,
+  Select,
+  Button,
+  Alert,
+  Spin,
+} from "antd";
 import { Link } from "react-router-dom";
 import { DeleteFilled, EyeFilled, EditFilled } from "@ant-design/icons";
-import classes from "./Location_manage.module.css";
+import classes from "./LocationManage.module.css";
 import Search from "antd/lib/input/Search";
-import { Button } from "antd";
-import { NavLink } from "react-router-dom";
-import { useHistory } from "react-router-dom";
+import { NavLink, useHistory } from "react-router-dom";
 
 const { Option } = Select;
 
-const Location_Management = () => {
+const LocationManagement = () => {
   const history = useHistory();
   const [data, setData] = useState([]);
+  console.log(
+    "🚀 ~ file: LocationManagement.js ~ line 26 ~ LocationManagement ~ data",
+    data.sports
+  );
 
   const [isSearched, setIsSearched] = useState(false);
   const [searchResult, setSearchResult] = useState([]);
 
   const [allSport, setAllSport] = useState([]);
+  console.log(allSport);
 
-  // const [isSport, setIsSport] = useState(false);
-  // const [sportResult, setSportResult] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasError, setHasError] = useState("");
+
+  const [isSport, setIsSport] = useState(false);
+  const [sportResult, setSportResult] = useState([]);
 
   const token = localStorage.getItem("access_token");
 
@@ -63,11 +79,13 @@ const Location_Management = () => {
       title: "Location name",
       dataIndex: "name",
       key: "name",
+      sorter: (a, b) => a.name.localeCompare(b.name),
     },
     {
       title: "Address",
       dataIndex: "address",
       key: "address",
+      sorter: (a, b) => a.address.localeCompare(b.address),
     },
     {
       title: "Available Sports",
@@ -84,11 +102,13 @@ const Location_Management = () => {
           })}
         </div>
       ),
+      // sorter: (a, b) => a.sports.localeCompare(b.sports),
     },
     {
       title: "flagCount",
       key: "flagCount",
       dataIndex: "flagCount",
+      sorter: (a, b) => a.flagCount.localeCompare(b.flagCount),
     },
     {
       title: "Verified",
@@ -99,6 +119,7 @@ const Location_Management = () => {
           <Checkbox checked={isVerified} />
         </div>
       ),
+      sorter: (a, b) => a.isVerified.localeCompare(b.isVerified),
     },
     {
       title: "Premium Location",
@@ -109,6 +130,7 @@ const Location_Management = () => {
           <Checkbox checked={isPremium} />
         </div>
       ),
+      sorter: (a, b) => a.isPremium.localeCompare(b.isPremium),
     },
 
     {
@@ -161,7 +183,7 @@ const Location_Management = () => {
       },
     ],
     start: 0,
-    length: 100,
+    length: 700,
     search: {
       value: "",
       regex: false,
@@ -170,6 +192,7 @@ const Location_Management = () => {
 
   useEffect(() => {
     // all table data get api
+    setIsLoading(true);
     fetch(`${API}/admin/api/getPlaceManagementList`, {
       method: "POST",
       headers: {
@@ -179,8 +202,13 @@ const Location_Management = () => {
       body: raw,
     })
       .then((response) => response.json())
-      .then((res) => setData(res.data.data))
-      .catch((err) => console.log(err.message));
+      .then((res) => {
+        setData(res.data.data);
+        setIsLoading(false);
+      })
+      .catch((error) => {
+        setHasError(error);
+      });
 
     // sport list data api
     fetch(`${API}/admin/api/getAllSports`, {
@@ -191,8 +219,13 @@ const Location_Management = () => {
       },
     })
       .then((response) => response.json())
-      .then((result) => setAllSport(result.data))
-      .catch((error) => console.log("error", error));
+      .then((result) => {
+        setAllSport(result.data);
+        setIsLoading(false);
+      })
+      .catch((error) => {
+        setHasError(error);
+      });
   }, []);
 
   const searchHandler = (searchInput) => {
@@ -206,24 +239,18 @@ const Location_Management = () => {
       setIsSearched(false);
     }
   };
-  // const selectHandler = (selectInput) => {
-  //   if (selectInput !== "") {
-  //     let selectSportName = allSport.filter((sportNamee) => {
-  //       return (
-  //         sportNamee.name.toLowerCase().indexOf(selectInput.toLowerCase()) >= 0
-  //       );
-  //     });
-  //     console.log(
-  //       "🚀 ~ file: Location_Management.js ~ line 219 ~ selectSportName ~ selectSportName",
-  //       selectSportName
-  //     );
-  //     setSportResult(selectSportName);
 
-  //     setIsSport(true);
-  //   } else {
-  //     setIsSport(false);
-  //   }
-  // };
+  const selectHandler = (selectSport) => {
+    // if (selectSport !== "") {
+    //   let selectSportName = data?.filter((sport) => {
+    //     return sport.name >= 0;
+    //   });
+    //   setSportResult(selectSportName);
+    //   setIsSport(true);
+    // } else {
+    //   setIsSport(false);
+    // }
+  };
 
   if (!token) {
     history.push("/login");
@@ -250,6 +277,7 @@ const Location_Management = () => {
       <Card className={classes.main_card}>
         <div className={classes.divLocationList}>
           <h1 className={classes.label}>Location List</h1>
+          <p style={{ marginTop: "5px" }}>Search : </p>
           <Search
             placeholder="search location"
             allowClear
@@ -260,7 +288,7 @@ const Location_Management = () => {
               alignTtems: "center",
             }}
           />
-          <div style={{ marginLeft: "45%", marginRight: "10px" }}>
+          <div style={{ marginLeft: "40%", marginRight: "10px" }}>
             <Button type="primary">
               <NavLink to="/location/add">Add Location</NavLink>
             </Button>
@@ -268,6 +296,7 @@ const Location_Management = () => {
           <div>
             <Select
               placeholder="Select Sport Name"
+              onSelect={selectHandler}
               allowClear
               // onSelect={selectHandler}
               // value={isSport === false ? allSport : sportResult}
@@ -281,16 +310,28 @@ const Location_Management = () => {
           </div>
         </div>
 
-        <Table
-          // className={classes.main_table}
-          rowKey="id"
-          columns={columns}
-          dataSource={isSearched === false ? data : searchResult}
-          pagination={true}
-        ></Table>
+        {hasError && <Alert message="something went wrong" type="error" />}
+        {isLoading && (
+          <Spin tip="Loading...">
+            <Alert
+              message="Loading data.."
+              description="Please wait for minute or refresh the page."
+              type="Server Issue"
+            />
+          </Spin>
+        )}
+        {!isLoading && (
+          <Table
+            rowKey="id"
+            columns={columns}
+            dataSource={isSearched === false ? data : searchResult}
+            pagination={true}
+            locale={{ emptyText: "Place Data Not Found...!" }}
+          ></Table>
+        )}
       </Card>
     </>
   );
 };
 
-export default Location_Management;
+export default LocationManagement;

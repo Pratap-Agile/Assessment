@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import TextField from "@material-ui/core/TextField";
@@ -7,11 +6,10 @@ import Paper from "@material-ui/core/Paper";
 import Grid from "@material-ui/core/Grid";
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import Typography from "@material-ui/core/Typography";
-
+import { useHistory } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
 import swal from "sweetalert";
 import { API } from "../API/API";
-import { NavLink } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -39,14 +37,14 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const Login = () => {
+  const history = useHistory();
   const classes = useStyles();
   const [email, setemail] = useState();
   const [password, setPassword] = useState();
-  console.log("login", email, password);
 
   const token = localStorage.getItem("access_token");
   if (token) {
-    return <NavLink to="/location" />;
+    history.push("/location");
   }
 
   async function loginUser(userdata) {

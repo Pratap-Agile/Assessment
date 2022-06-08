@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router";
 import "antd/dist/antd.css";
-import { Table, Card, Checkbox, Avatar, Space } from "antd";
-import { Link } from "react-router-dom";
-import { API } from "../../API/API";
+import { Table, Card, Alert, Spin } from "antd";
+import { API } from "../../../API/API";
 import { useHistory } from "react-router-dom";
-import classes from "./Past_Event.module.css";
+import classes from "../Event/EventList/EventList.module.css";
 
-const Location_Review = () => {
+const LocationReview = () => {
   const history = useHistory();
   const { id } = useParams();
   const [review, setReview] = useState([]);
-  const [loading, setloading] = useState(true);
-  // console.log("review", review);
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasError, setHasError] = useState("");
 
   const token = localStorage.getItem("access_token");
 
@@ -110,12 +110,18 @@ const Location_Review = () => {
   ];
 
   useEffect(() => {
+    setIsLoading(true);
     fetch(`${API}/v6/api/getPlaceReviewList`, requestOptionsEvent)
       .then((response) => response.json())
-      .then((result) => setReview(result.data))
-      .catch((error) => console.log("error", error));
+      .then((result) => {
+        console.log(result.data);
+        setIsLoading(false);
+      })
+      .catch((error) => {
+        setHasError(error);
+      });
   }, []);
-  
+
   if (!token) {
     history.push("/login");
   }
@@ -123,20 +129,28 @@ const Location_Review = () => {
     <>
       <Card className={classes.main_card}>
         <h1 className={classes.label}>Location Reviews</h1>
-        {/* {loading ? (
-          "Loading"
-        ) : ( */}
-        <Table
-          // className={classes.main_table}
-          rowKey="id"
-          columns={columns}
-          dataSource={review}
-          pagination={true}
-        ></Table>
-        {/* )} */}
+        {hasError && <Alert message="something went wrong" type="error" />}
+        {isLoading && (
+          <Spin tip="Loading...">
+            <Alert
+              message="Loading data.."
+              description="Please wait for minute or refresh the page."
+              type="Server Issue"
+            />
+          </Spin>
+        )}
+        {!isLoading && (
+          <Table
+            // className={classes.main_table}
+            rowKey="id"
+            columns={columns}
+            dataSource={review}
+            pagination={true}
+          ></Table>
+        )}
       </Card>
     </>
   );
 };
 
-export default Location_Review;
+export default LocationReview;

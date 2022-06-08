@@ -3,13 +3,14 @@ import "./App.css";
 import { Route, Switch } from "react-router-dom";
 
 import Login from "./Auth/Login";
-import Location_Management from "./Pages/Location_Mange/Location_Management";
-import View_Location from "./Pages/View_Location/View_Location";
-import Edit_location from "./Pages/Edit_Location/Edit_Location";
-import Add_Location from "./Pages/Add_Location/Add_Location";
+import LocationManagement from "./Pages/LocationMange/LocationManagement";
+import View_Location from "./Pages/ViewLocation/ViewLocation";
+import EditLocation from "./Pages/EditLocation/EditLocation";
+import AddLocation from "./Pages/AddLocation/AddLocation";
+import AddEvent from "./Pages/ViewLocation/Event/AddEvent/AddEvent";
 
 function App() {
-  const token = localStorage.getItem("access_token");
+  // const token = localStorage.getItem("access_token");
 
   return (
     <div className="App">
@@ -21,16 +22,19 @@ function App() {
           <Login />
         </Route>
         <Route path="/location" exact>
-          <Location_Management />
+          <LocationManagement />
         </Route>
         <Route path="/location/view/:id" exact>
           <View_Location />
         </Route>
         <Route path="/location/edit/:id" exact>
-          <Edit_location />
+          <EditLocation />
         </Route>
         <Route path="/location/add" exact>
-          <Add_Location />
+          <AddLocation />
+        </Route>
+        <Route path="/location/add-event/:id" exact>
+          <AddEvent />
         </Route>
       </Switch>
     </div>
