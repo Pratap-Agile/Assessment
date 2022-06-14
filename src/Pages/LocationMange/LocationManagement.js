@@ -23,22 +23,19 @@ const { Option } = Select;
 const LocationManagement = () => {
   const history = useHistory();
   const [data, setData] = useState([]);
-  console.log(
-    "🚀 ~ file: LocationManagement.js ~ line 26 ~ LocationManagement ~ data",
-    data.sports
-  );
 
   const [isSearched, setIsSearched] = useState(false);
   const [searchResult, setSearchResult] = useState([]);
 
   const [allSport, setAllSport] = useState([]);
-  console.log(allSport);
 
   const [isLoading, setIsLoading] = useState(false);
   const [hasError, setHasError] = useState("");
 
   const [isSport, setIsSport] = useState(false);
   const [sportResult, setSportResult] = useState([]);
+
+  const [totalPage, setTotalPage] = useState(1);
 
   const token = localStorage.getItem("access_token");
 
@@ -183,7 +180,7 @@ const LocationManagement = () => {
       },
     ],
     start: 0,
-    length: 700,
+    length: 500,
     search: {
       value: "",
       regex: false,
@@ -193,22 +190,7 @@ const LocationManagement = () => {
   useEffect(() => {
     // all table data get api
     setIsLoading(true);
-    fetch(`${API}/admin/api/getPlaceManagementList`, {
-      method: "POST",
-      headers: {
-        Authorization: token,
-        "Content-Type": "application/json",
-      },
-      body: raw,
-    })
-      .then((response) => response.json())
-      .then((res) => {
-        setData(res.data.data);
-        setIsLoading(false);
-      })
-      .catch((error) => {
-        setHasError(error);
-      });
+    fetchRecords(1);
 
     // sport list data api
     fetch(`${API}/admin/api/getAllSports`, {
@@ -228,10 +210,36 @@ const LocationManagement = () => {
       });
   }, []);
 
+  const fetchRecords = (page) => {
+    setIsLoading(true);
+    fetch(`${API}/admin/api/getPlaceManagementList?page=${page}&size=10`, {
+      method: "POST",
+      headers: {
+        Authorization: token,
+        "Content-Type": "application/json",
+      },
+      body: raw,
+    })
+      .then((response) => response.json())
+      .then((res) => {
+        setData(res.data.data);
+        setIsLoading(false);
+      })
+      .catch((error) => {
+        setHasError(error);
+      });
+  };
+
   const searchHandler = (searchInput) => {
     if (searchInput !== "") {
       let serchedUser = data.filter((user) => {
-        return user.name.toLowerCase().indexOf(searchInput.toLowerCase()) >= 0;
+        const query = searchInput.toLowerCase();
+        return (
+          user.name.toLowerCase().indexOf(query) >= 0 ||
+          user.address.toLowerCase().indexOf(query) >= 0
+          // user.sports.toLowerCase().indexOf(query) >= 0
+          // user.name.toLowerCase().indexOf(searchInput.toLowerCase()) >= 0
+        );
       });
       setSearchResult(serchedUser);
       setIsSearched(true);
@@ -241,15 +249,25 @@ const LocationManagement = () => {
   };
 
   const selectHandler = (selectSport) => {
-    // if (selectSport !== "") {
-    //   let selectSportName = data?.filter((sport) => {
-    //     return sport.name >= 0;
-    //   });
-    //   setSportResult(selectSportName);
-    //   setIsSport(true);
-    // } else {
-    //   setIsSport(false);
-    // }
+    if (selectSport !== "") {
+      let selectSportName = data?.filter((sport) => {
+        const selectquery = selectSport.toLowerCase();
+        return (
+          sport?.sports
+            ?.map(
+              (sportname) =>
+                // <div key={sportname?._id} value={sportname?._id}>
+                sportname.name
+              // </div>
+            )
+            .indexOf(selectquery) >= 0
+        );
+      });
+      setSportResult(selectSportName);
+      setIsSport(true);
+    } else {
+      setIsSport(false);
+    }
   };
 
   if (!token) {
@@ -285,7 +303,6 @@ const LocationManagement = () => {
             style={{
               maxWidth: "fit-content",
               justifyContent: "center",
-              alignTtems: "center",
             }}
           />
           <div style={{ marginLeft: "40%", marginRight: "10px" }}>
@@ -298,8 +315,7 @@ const LocationManagement = () => {
               placeholder="Select Sport Name"
               onSelect={selectHandler}
               allowClear
-              // onSelect={selectHandler}
-              // value={isSport === false ? allSport : sportResult}
+              value={isSport === false ? allSport : sportResult}
             >
               {allSport?.map((text) => (
                 <Option key={text?._id} value={text?._id}>
@@ -326,6 +342,16 @@ const LocationManagement = () => {
             columns={columns}
             dataSource={isSearched === false ? data : searchResult}
             pagination={true}
+            // pagination={
+            //   ({
+            //     pageSize: 10,
+            //     total: totalPage,
+            //     onChange: (page) => {
+            //       fetchRecords(page);
+            //     },
+            //   },
+            //   true)
+            // }
             locale={{ emptyText: "Place Data Not Found...!" }}
           ></Table>
         )}

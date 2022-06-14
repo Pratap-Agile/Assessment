@@ -11,10 +11,6 @@ const { Option } = Select;
 const AddLocation = () => {
   const history = useHistory();
   const [chooseImage, setChooseImage] = useState();
-  console.log(
-    "🚀 ~ file: AddLocation.js ~ line 14 ~ AddLocation ~ chooseImage",
-    chooseImage
-  );
 
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
@@ -100,7 +96,7 @@ const AddLocation = () => {
   const verifyCheck = () => {
     var checkBox = document.getElementById("myCheckVerify");
 
-    if (checkBox.checked == true) {
+    if (checkBox.checked === true) {
       setVerify(true);
     } else {
       setVerify(false);
@@ -110,7 +106,7 @@ const AddLocation = () => {
   const premiumCheck = () => {
     var checkBox = document.getElementById("myCheckPremium");
 
-    if (checkBox.checked == true) {
+    if (checkBox.checked === true) {
       setPremium(true);
     } else {
       setPremium(false);
@@ -171,6 +167,7 @@ const AddLocation = () => {
               </label>
               {hasError && <p>Something went wrong</p>}
               <Select
+                mode="multiple"
                 placeholder="Select Sport Name"
                 allowClear
                 onChange={selectSportHandler}

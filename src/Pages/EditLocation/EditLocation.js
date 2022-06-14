@@ -185,7 +185,6 @@ const EditLocation = () => {
     history.push("/location");
   };
   const imageHandleChange = (e) => {
-    console.log(e.target.files);
     setPlaceImage(URL.createObjectURL(e.target.files[0]));
   };
 

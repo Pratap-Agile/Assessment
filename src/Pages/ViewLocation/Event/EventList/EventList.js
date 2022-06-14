@@ -117,7 +117,6 @@ const EventList = () => {
     fetch(`${API}/admin/api/getPlaceEventList`, requestOptions)
       .then((response) => response.json())
       .then((result) => {
-        console.log(result);
         // setData(result.data);
         setIsLoading(false);
       })
